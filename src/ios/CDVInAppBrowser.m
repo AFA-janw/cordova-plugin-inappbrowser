@@ -68,7 +68,7 @@
     [self.inAppBrowserViewController close];
 }
 
-- (void)email:(CDVInvokedUrlCommand*)command
+- (void)email
 {
     if (self.callbackId != nil) {
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
@@ -868,8 +868,8 @@
 - (void)email
 {
     if ((self.navigationDelegate != nil) && [self.navigationDelegate respondsToSelector:@selector(email)]) {
-            [self.navigationDelegate email];
-        }
+        [self.navigationDelegate email];
+    }
 }
 
 - (void)navigateTo:(NSURL*)url
