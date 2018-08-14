@@ -71,13 +71,21 @@
 - (void)email:(CDVInvokedUrlCommand*)command
 {
     if (self.callbackId != nil) {
+        // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"email", @"url":url}];
+                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"IAB.close() called but it was already closed.");
+        return;
+    }
+    // Things are cleaned up in browserExit.
+    [self.inAppBrowserViewController close];
 }
 
 - (BOOL) isSystemUrl:(NSURL*)url
@@ -595,7 +603,7 @@
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
 
-    self.emailButton = [[UIBarButtonItem alloc] initWithTitle:@"Email" style:UIBarButtonItemStyleBordered target:self action:@selector(email)];
+    self.emailButton = [[UIBarButtonItem alloc] initWithTitle:@"Email" style:UIBarButtonItemStyleBordered target:self action:nil];
     self.emailButton.enabled = YES;
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -863,6 +871,13 @@
             }];
         }
     });
+}
+
+- (void)email
+{
+    if ((self.navigationDelegate != nil) && [self.navigationDelegate respondsToSelector:@selector(email)]) {
+            [self.navigationDelegate email];
+        }
 }
 
 - (void)navigateTo:(NSURL*)url
