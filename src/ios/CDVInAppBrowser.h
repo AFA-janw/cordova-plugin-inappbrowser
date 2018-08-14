@@ -104,6 +104,7 @@
 @property (nonatomic) NSURL* currentURL;
 
 - (void)close;
+- (void)email;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
